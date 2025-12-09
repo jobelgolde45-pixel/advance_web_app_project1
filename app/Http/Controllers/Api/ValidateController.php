@@ -126,21 +126,29 @@ class ValidateController extends Controller
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'login' => 'required|string', // Can be email, username, or mobile number
-            'password' => 'required|string',
-        ]);
+         $validator = Validator::make($request->all(), [
+        'login' => 'required_without:identifier,email,username|string',
+        'identifier' => 'required_without:login,email,username|string',
+        'email' => 'required_without:login,identifier,username|string|email',
+        'username' => 'required_without:login,identifier,email|string',
+        'password' => 'required|string',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
+    }
 
-        // Determine login field
-        $loginField = $this->getLoginField($request->login);
-        
+    // Determine which field contains the login value
+    $loginValue = $request->login ?? $request->identifier ?? $request->email ?? $request->username;
+    $loginField = $this->getLoginField($loginValue);
+    
+    $credentials = [
+        $loginField => $loginValue,
+        'password' => $request->password,
+    ];
         $credentials = [
             $loginField => $request->login,
             'password' => $request->password,
@@ -191,13 +199,16 @@ class ValidateController extends Controller
             'success' => true,
             'message' => 'Login successful',
             'data' => [
-                'user' => $user->load('profileInfo'),
+                'user' => $user->load(relations: 'profileInfo'),
                 'access_token' => $token,
                 'token_type' => 'Bearer',
             ]
         ]);
     }
 
+    public function loginPage(){
+        return redirect('/login-page');
+    }
     /**
      * Logout user
      */

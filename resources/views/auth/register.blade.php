@@ -436,7 +436,7 @@
         <div class="text-center mt-6">
             <p class="text-gray-600">
                 Already have an account? 
-                <a href="/login" class="text-blue-600 font-medium hover:underline">Sign in here</a>
+                <a href="/login-page" class="text-blue-600 font-medium hover:underline">Sign in here</a>
             </p>
         </div>
 

@@ -110,33 +110,13 @@
                         </span>
                     </button>
 
-                    <!-- Divider -->
-                    <div class="relative my-6">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-gray-300"></div>
-                        </div>
-                        <div class="relative flex justify-center text-sm">
-                            <span class="px-4 bg-white text-gray-500">Or continue with</span>
-                        </div>
-                    </div>
-
-                    <!-- Social Login Buttons -->
-                    <div class="grid grid-cols-2 gap-4">
-                        <button type="button" onclick="socialLogin('google')"
-                                class="social-btn bg-red-50 text-red-600 border border-red-200 py-3 rounded-xl font-medium hover:bg-red-100">
-                            <i class="fab fa-google mr-2"></i>Google
-                        </button>
-                        <button type="button" onclick="socialLogin('facebook')"
-                                class="social-btn bg-blue-50 text-blue-600 border border-blue-200 py-3 rounded-xl font-medium hover:bg-blue-100">
-                            <i class="fab fa-facebook mr-2"></i>Facebook
-                        </button>
-                    </div>
+                    
 
                     <!-- Register Link -->
                     <div class="text-center pt-6 border-t border-gray-200">
                         <p class="text-gray-600">
                             Don't have an account?
-                            <a href="/register" class="text-indigo-600 font-semibold hover:text-indigo-800 hover:underline">
+                            <a href="/" class="text-indigo-600 font-semibold hover:text-indigo-800 hover:underline">
                                 Create account
                             </a>
                         </p>
@@ -339,328 +319,504 @@
         </div>
     </div>
 
+    
     <script>
-        // Demo credentials
-        const demoAccounts = {
-            tenant: {
-                identifier: 'juan.tenant',
-                password: 'Password123'
-            },
-            owner: {
-                identifier: 'maria.owner',
-                password: 'Password123'
-            },
-            admin: {
-                identifier: 'admin',
-                password: 'Admin123'
-            }
-        };
+    // Demo credentials
+    const demoAccounts = {
+        tenant: {
+            identifier: 'juan.tenant',
+            password: 'Password123'
+        },
+        owner: {
+            identifier: 'maria.owner',
+            password: 'Password123'
+        },
+        admin: {
+            identifier: 'admin',
+            password: 'Admin123'
+        }
+    };
 
-        // Form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        // Get form data
+        const identifier = document.getElementById('identifier').value;
+        const password = document.getElementById('password').value;
+        const remember = document.getElementById('remember').checked;
+        
+        // Validate
+        if (!identifier || !password) {
+            showNotification('Please fill in all fields', 'error');
+            return;
+        }
+        
+        // Show loading
+        submitBtn.disabled = true;
+        loadingSpinner.classList.remove('hidden');
+        
+        try {
+            // Prepare login data
+            const loginData = {
+                login: identifier, // Send as identifier
+                password: password,
+                remember: remember
+            };
             
-            const submitBtn = document.getElementById('submitBtn');
-            const loadingSpinner = document.getElementById('loadingSpinner');
+            // Get CSRF token from meta tag (if using Laravel)
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             
-            // Get form data
-            const identifier = document.getElementById('identifier').value;
-            const password = document.getElementById('password').value;
-            const remember = document.getElementById('remember').checked;
+            // Headers configuration
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
             
-            // Validate
-            if (!identifier || !password) {
-                showNotification('Please fill in all fields', 'error');
-                return;
+            // Add CSRF token if available
+            if (csrfToken) {
+                headers['X-CSRF-TOKEN'] = csrfToken;
             }
             
-            // Show loading
-            submitBtn.disabled = true;
-            loadingSpinner.classList.remove('hidden');
+            // Send login request
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(loginData)
+            });
             
-            try {
-                // Prepare login data (can use email or username)
-                const loginData = {
-                    password: password,
-                    remember: remember
-                };
+            // Parse response
+            const result = await response.json();
+            
+            if (response.ok) {
+                showNotification('Login successful! Redirecting...', 'success');
                 
-                // Determine if identifier is email or username
-                if (identifier.includes('@')) {
-                    loginData.email = identifier;
-                } else {
-                    loginData.username = identifier;
-                }
-                
-                // Send login request
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(loginData)
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showNotification('Login successful! Redirecting...', 'success');
+                // Save token if present
+                if (result.token || result.access_token) {
+                    const token = result.token || result.access_token;
+                    localStorage.setItem('authToken', token.startsWith('Bearer ') ? token : `Bearer ${token}`);
+                    localStorage.setItem('userData', JSON.stringify(result.user || {}));
                     
-                    // Save token if present
-                    if (result.token || result.access_token) {
-                        const token = result.token || result.access_token;
-                        localStorage.setItem('authToken', `Bearer ${token}`);
-                        localStorage.setItem('userData', JSON.stringify(result.user || {}));
-                        
-                        // Remember me
-                        if (remember) {
-                            localStorage.setItem('rememberedUser', identifier);
-                        }
+                    // Remember me
+                    if (remember) {
+                        localStorage.setItem('rememberedUser', identifier);
+                    } else {
+                        localStorage.removeItem('rememberedUser');
                     }
-                    
-                    // Redirect based on user type
-                    setTimeout(() => {
-                        const userType = result.user?.user_type || 'tenant';
-                        const redirects = {
-                            'admin': '/admin/dashboard',
-                            'owner': '/owner/dashboard',
-                            'tenant': '/tenant/dashboard'
-                        };
-                        
-                        window.location.href = redirects[userType.toLowerCase()] || '/dashboard';
-                    }, 1500);
-                    
-                } else {
-                    showNotification(result.message || 'Invalid credentials', 'error');
-                    submitBtn.disabled = false;
-                    loadingSpinner.classList.add('hidden');
                 }
                 
-            } catch (error) {
-                showNotification('Network error. Please try again.', 'error');
+                // Redirect based on user type
+                setTimeout(() => {
+                    const userType = result.user?.user_type || result.user?.role || 'tenant';
+                    const redirects = {
+                        'admin': '/admin/dashboard',
+                        'owner': '/owner/dashboard',
+                        'tenant': '/tenant/dashboard'
+                    };
+                    
+                    window.location.href = redirects[userType.toLowerCase()] || '/dashboard';
+                }, 1500);
+                
+            } else {
+                // Handle different error types
+                if (response.status === 422 && result.errors) {
+                    // Validation errors
+                    const errorMessages = Object.values(result.errors).flat().join(', ');
+                    showNotification(errorMessages, 'error');
+                } else if (response.status === 401) {
+                    showNotification(result.message || 'Invalid credentials. Please check your username/email and password.', 'error');
+                } else {
+                    showNotification(result.message || 'Login failed. Please try again.', 'error');
+                }
                 submitBtn.disabled = false;
                 loadingSpinner.classList.add('hidden');
             }
-        });
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            showNotification('Network error. Please check your connection and try again.', 'error');
+            submitBtn.disabled = false;
+            loadingSpinner.classList.add('hidden');
+        }
+    });
 
-        // Forgot password form
-        document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    // Forgot password form
+    document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('resetSubmitBtn');
+        const loadingSpinner = document.getElementById('resetLoading');
+        const email = document.getElementById('resetEmail').value;
+        
+        if (!validateEmail(email)) {
+            showNotification('Please enter a valid email address', 'error');
+            return;
+        }
+        
+        // Show loading
+        submitBtn.disabled = true;
+        loadingSpinner.classList.remove('hidden');
+        
+        try {
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             
-            const submitBtn = document.getElementById('resetSubmitBtn');
-            const loadingSpinner = document.getElementById('resetLoading');
-            const email = document.getElementById('resetEmail').value;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
             
-            if (!validateEmail(email)) {
-                showNotification('Please enter a valid email address', 'error');
-                return;
+            if (csrfToken) {
+                headers['X-CSRF-TOKEN'] = csrfToken;
             }
             
-            // Show loading
-            submitBtn.disabled = true;
-            loadingSpinner.classList.remove('hidden');
+            const response = await fetch('/api/password/forgot', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({ email: email })
+            });
             
-            try {
-                const response = await fetch('/api/password/forgot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ email: email })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showNotification('Password reset link sent! Check your email.', 'success');
-                    hideForgotPassword();
+            const result = await response.json();
+            
+            if (response.ok) {
+                showNotification('Password reset link sent! Check your email.', 'success');
+                hideForgotPassword();
+            } else {
+                if (response.status === 422 && result.errors) {
+                    const errorMessages = Object.values(result.errors).flat().join(', ');
+                    showNotification(errorMessages, 'error');
                 } else {
                     showNotification(result.message || 'Failed to send reset link', 'error');
                 }
-                
-            } catch (error) {
-                showNotification('Network error. Please try again.', 'error');
-            } finally {
-                submitBtn.disabled = false;
-                loadingSpinner.classList.add('hidden');
             }
-        });
-
-        // Utility functions
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const icon = document.getElementById('passwordIcon');
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.className = 'fas fa-eye-slash';
-            } else {
-                passwordInput.type = 'password';
-                icon.className = 'fas fa-eye';
-            }
+        } catch (error) {
+            console.error('Forgot password error:', error);
+            showNotification('Network error. Please try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            loadingSpinner.classList.add('hidden');
         }
+    });
 
-        function fillDemoCredentials(type) {
-            const account = demoAccounts[type];
-            if (account) {
-                document.getElementById('identifier').value = account.identifier;
-                document.getElementById('password').value = account.password;
-                document.getElementById('remember').checked = true;
-                
-                showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} credentials loaded`, 'info');
-            }
+    // Utility functions
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const icon = document.getElementById('passwordIcon');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            passwordInput.type = 'password';
+            icon.className = 'fas fa-eye';
         }
+    }
 
-        function toggleDemoAccounts() {
-            const demoDiv = document.getElementById('demoAccounts');
-            const icon = document.getElementById('demoToggleIcon');
+    function fillDemoCredentials(type) {
+        const account = demoAccounts[type];
+        if (account) {
+            document.getElementById('identifier').value = account.identifier;
+            document.getElementById('password').value = account.password;
+            document.getElementById('remember').checked = true;
             
-            if (demoDiv.classList.contains('hidden')) {
-                demoDiv.classList.remove('hidden');
-                icon.className = 'fas fa-chevron-up';
-            } else {
-                demoDiv.classList.add('hidden');
-                icon.className = 'fas fa-chevron-down';
+            showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} credentials loaded`, 'info');
+        }
+    }
+
+    function toggleDemoAccounts() {
+        const demoDiv = document.getElementById('demoAccounts');
+        const icon = document.getElementById('demoToggleIcon');
+        
+        if (demoDiv.classList.contains('hidden')) {
+            demoDiv.classList.remove('hidden');
+            icon.className = 'fas fa-chevron-up';
+        } else {
+            demoDiv.classList.add('hidden');
+            icon.className = 'fas fa-chevron-down';
+        }
+    }
+
+    function showForgotPassword() {
+        document.getElementById('forgotPasswordModal').classList.remove('hidden');
+    }
+
+    function hideForgotPassword() {
+        document.getElementById('forgotPasswordModal').classList.add('hidden');
+        document.getElementById('forgotPasswordForm').reset();
+    }
+
+    function socialLogin(provider) {
+        showNotification(`Connecting with ${provider}... (Demo)`, 'info');
+        // In real app: window.location.href = `/auth/${provider}`;
+    }
+
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // Fixed Notification system
+    function showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        const icon = document.getElementById('notificationIcon');
+        const title = document.getElementById('notificationTitle');
+        const messageEl = document.getElementById('notificationMessage');
+        const progressBar = notification.querySelector('#notificationProgress div');
+        
+        const config = {
+            success: {
+                icon: '<i class="fas fa-check-circle text-green-500 text-xl"></i>',
+                title: 'Success',
+                bgColor: 'green'
+            },
+            error: {
+                icon: '<i class="fas fa-exclamation-circle text-red-500 text-xl"></i>',
+                title: 'Error',
+                bgColor: 'red'
+            },
+            info: {
+                icon: '<i class="fas fa-info-circle text-blue-500 text-xl"></i>',
+                title: 'Info',
+                bgColor: 'blue'
+            },
+            warning: {
+                icon: '<i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>',
+                title: 'Warning',
+                bgColor: 'yellow'
             }
+        };
+        
+        const cfg = config[type] || config.info;
+        
+        // Clear previous notification classes
+        notification.classList.remove(
+            'bg-green-50', 'border-green-200',
+            'bg-red-50', 'border-red-200',
+            'bg-blue-50', 'border-blue-200',
+            'bg-yellow-50', 'border-yellow-200'
+        );
+        
+        // Add new classes individually
+        if (cfg.bgColor === 'green') {
+            notification.classList.add('bg-green-50', 'border-green-200');
+            title.className = 'font-semibold text-green-700';
+        } else if (cfg.bgColor === 'red') {
+            notification.classList.add('bg-red-50', 'border-red-200');
+            title.className = 'font-semibold text-red-700';
+        } else if (cfg.bgColor === 'blue') {
+            notification.classList.add('bg-blue-50', 'border-blue-200');
+            title.className = 'font-semibold text-blue-700';
+        } else if (cfg.bgColor === 'yellow') {
+            notification.classList.add('bg-yellow-50', 'border-yellow-200');
+            title.className = 'font-semibold text-yellow-700';
         }
+        
+        icon.innerHTML = cfg.icon;
+        title.textContent = cfg.title;
+        messageEl.textContent = message;
+        
+        notification.classList.remove('translate-x-full');
+        
+        // Reset and animate progress bar
+        progressBar.style.width = '0%';
+        void progressBar.offsetWidth; // Trigger reflow
+        progressBar.style.width = '100%';
+        progressBar.style.transition = 'width 5s linear';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            hideNotification();
+        }, 5000);
+    }
 
-        function showForgotPassword() {
-            document.getElementById('forgotPasswordModal').classList.remove('hidden');
+    function hideNotification() {
+        const notification = document.getElementById('notification');
+        notification.classList.add('translate-x-full');
+        
+        // Reset progress bar
+        const progressBar = notification.querySelector('#notificationProgress div');
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+    }
+
+    // Auto-fill remembered user
+    document.addEventListener('DOMContentLoaded', function() {
+        const rememberedUser = localStorage.getItem('rememberedUser');
+        if (rememberedUser) {
+            document.getElementById('identifier').value = rememberedUser;
+            document.getElementById('remember').checked = true;
         }
-
-        function hideForgotPassword() {
-            document.getElementById('forgotPasswordModal').classList.add('hidden');
-            document.getElementById('forgotPasswordForm').reset();
+        
+        // Check URL for errors
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const message = urlParams.get('message');
+        
+        if (error) {
+            showNotification(message || 'Please check your credentials', 'error');
         }
+        
+        // Show welcome message
+        setTimeout(() => {
+            showNotification('Welcome! Try demo accounts for quick testing.', 'info');
+        }, 1000);
+        
+        // Add CSRF token to all forms
+        addCsrfTokenToForms();
+    });
 
-        function socialLogin(provider) {
-            showNotification(`Connecting with ${provider}... (Demo)`, 'info');
-            // In real app: window.location.href = `/auth/${provider}`;
-        }
-
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-
-        // Notification system
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            const icon = document.getElementById('notificationIcon');
-            const title = document.getElementById('notificationTitle');
-            const messageEl = document.getElementById('notificationMessage');
-            const progressBar = notification.querySelector('#notificationProgress div');
-            
-            const config = {
-                success: {
-                    icon: '<i class="fas fa-check-circle text-green-500 text-xl"></i>',
-                    title: 'Success',
-                    bg: 'bg-green-50 border-green-200'
-                },
-                error: {
-                    icon: '<i class="fas fa-exclamation-circle text-red-500 text-xl"></i>',
-                    title: 'Error',
-                    bg: 'bg-red-50 border-red-200'
-                },
-                info: {
-                    icon: '<i class="fas fa-info-circle text-blue-500 text-xl"></i>',
-                    title: 'Info',
-                    bg: 'bg-blue-50 border-blue-200'
-                },
-                warning: {
-                    icon: '<i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>',
-                    title: 'Warning',
-                    bg: 'bg-yellow-50 border-yellow-200'
+    // Add CSRF token to forms
+    function addCsrfTokenToForms() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken) {
+            // Add hidden input to forms
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                if (!form.querySelector('input[name="_token"]')) {
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '_token';
+                    tokenInput.value = csrfToken;
+                    form.appendChild(tokenInput);
                 }
-            };
-            
-            const cfg = config[type] || config.info;
-            
-            icon.innerHTML = cfg.icon;
-            title.textContent = cfg.title;
-            title.className = `${type === 'error' ? 'text-red-700' : type === 'success' ? 'text-green-700' : type === 'warning' ? 'text-yellow-700' : 'text-blue-700'}`;
-            messageEl.textContent = message;
-            
-            notification.classList.remove('translate-x-full');
-            notification.className = notification.className.replace(/bg-[\w-]+ border-[\w-]+/, '');
-            notification.classList.add(cfg.bg);
-            
-            // Animate progress bar
-            progressBar.style.width = '100%';
-            progressBar.style.transition = 'width 5s linear';
-            
-            setTimeout(() => {
-                hideNotification();
-            }, 5000);
+            });
         }
+    }
 
-        function hideNotification() {
-            document.getElementById('notification').classList.add('translate-x-full');
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Shift+T for tenant demo
+        if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+            e.preventDefault();
+            fillDemoCredentials('tenant');
         }
+        // Ctrl+Shift+O for owner demo
+        if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+            e.preventDefault();
+            fillDemoCredentials('owner');
+        }
+        // Ctrl+Shift+A for admin demo
+        if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+            e.preventDefault();
+            fillDemoCredentials('admin');
+        }
+        // Escape to close modals
+        if (e.key === 'Escape') {
+            hideForgotPassword();
+        }
+        // Enter to submit form (if focused)
+        if (e.key === 'Enter' && !e.target.closest('#forgotPasswordModal')) {
+            // Let the form handle it naturally
+        }
+    });
 
-        // Auto-fill remembered user
-        document.addEventListener('DOMContentLoaded', function() {
-            const rememberedUser = localStorage.getItem('rememberedUser');
-            if (rememberedUser) {
-                document.getElementById('identifier').value = rememberedUser;
-                document.getElementById('remember').checked = true;
-            }
-            
-            // Check URL for errors
-            const urlParams = new URLSearchParams(window.location.search);
-            const error = urlParams.get('error');
-            const message = urlParams.get('message');
-            
-            if (error) {
-                showNotification(message || 'Please check your credentials', 'error');
-            }
-            
-            // Show welcome message
-            setTimeout(() => {
-                showNotification('Welcome! Try demo accounts for quick testing.', 'info');
-            }, 1000);
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Ctrl+Shift+T for tenant demo
-            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
-                e.preventDefault();
-                fillDemoCredentials('tenant');
-            }
-            // Ctrl+Shift+O for owner demo
-            if (e.ctrlKey && e.shiftKey && e.key === 'O') {
-                e.preventDefault();
-                fillDemoCredentials('owner');
-            }
-            // Ctrl+Shift+A for admin demo
-            if (e.ctrlKey && e.shiftKey && e.key === 'A') {
-                e.preventDefault();
-                fillDemoCredentials('admin');
-            }
-            // Escape to close modals
-            if (e.key === 'Escape') {
-                hideForgotPassword();
+    // Add floating label functionality
+    document.querySelectorAll('.floating-input').forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
             }
         });
+        
+        input.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+        
+        // Initialize on page load
+        if (input.value.trim() !== '') {
+            input.classList.add('has-value');
+        }
+    });
 
-        // Add floating label functionality
-        document.querySelectorAll('.floating-input').forEach(input => {
-            input.addEventListener('blur', function() {
-                if (this.value.trim() !== '') {
-                    this.classList.add('has-value');
-                } else {
-                    this.classList.remove('has-value');
+    // Form validation helpers
+    function validateFormField(field, type = 'text') {
+        const value = field.value.trim();
+        
+        if (!value) {
+            return 'This field is required';
+        }
+        
+        if (type === 'email' && !validateEmail(value)) {
+            return 'Please enter a valid email address';
+        }
+        
+        if (type === 'password' && value.length < 6) {
+            return 'Password must be at least 6 characters';
+        }
+        
+        return null; // No error
+    }
+
+    // Add input validation on blur
+    document.getElementById('identifier').addEventListener('blur', function() {
+        const error = validateFormField(this, this.value.includes('@') ? 'email' : 'text');
+        if (error) {
+            this.classList.add('border-red-500');
+        } else {
+            this.classList.remove('border-red-500');
+        }
+    });
+
+    document.getElementById('password').addEventListener('blur', function() {
+        const error = validateFormField(this, 'password');
+        if (error) {
+            this.classList.add('border-red-500');
+        } else {
+            this.classList.remove('border-red-500');
+        }
+    });
+
+    // Add a helper to check if user is already logged in
+    async function checkAuthStatus() {
+        const token = localStorage.getItem('authToken');
+        if (!token) return false;
+        
+        try {
+            const response = await fetch('/api/user', {
+                headers: {
+                    'Authorization': token,
+                    'Accept': 'application/json'
                 }
             });
             
-            // Initialize on page load
-            if (input.value.trim() !== '') {
-                input.classList.add('has-value');
+            if (response.ok) {
+                const user = await response.json();
+                // Redirect to appropriate dashboard if already logged in
+                const userType = user.user_type || user.role || 'tenant';
+                const redirects = {
+                    'admin': '/admin/dashboard',
+                    'owner': '/owner/dashboard',
+                    'tenant': '/tenant/dashboard'
+                };
+                
+                const redirectUrl = redirects[userType.toLowerCase()];
+                if (redirectUrl && !window.location.pathname.includes(redirectUrl)) {
+                    window.location.href = redirectUrl;
+                }
+                return true;
             }
-        });
-    </script>
+        } catch (error) {
+            console.log('Auth check failed, user not logged in');
+        }
+        
+        return false;
+    }
+
+    // Check auth status on page load
+    checkAuthStatus();
+</script>
+
 </body>
 </html>
