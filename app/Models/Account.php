@@ -13,9 +13,9 @@ class Account extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'accounts';
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'id';
 
-    public $incrementing = false;
+    public $incrementing = true;
     protected $keyType = 'string';
 
     protected $fillable = [

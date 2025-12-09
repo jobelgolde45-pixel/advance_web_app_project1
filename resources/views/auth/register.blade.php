@@ -764,7 +764,7 @@
                     showResponse('Account created successfully! Redirecting to login...', 'success');
                     // Redirect to login after 2 seconds
                     setTimeout(() => {
-                        window.location.href = '/login';
+                        window.location.href = '/welcome';
                     }, 2000);
                 } else {
                     // Show validation errors
@@ -926,7 +926,7 @@
             // Add dev button for testing
             const devButton = document.createElement('button');
             devButton.className = 'fixed bottom-4 left-4 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm opacity-50 hover:opacity-100';
-            devButton.innerHTML = '<i class="fas fa-vial mr-1"></i> Load Sample Data';
+             devButton.innerHTML = '<i class="fas fa-vial mr-1"></i> Load Sample Data';
             devButton.onclick = fillSampleData;
             document.body.appendChild(devButton);
             

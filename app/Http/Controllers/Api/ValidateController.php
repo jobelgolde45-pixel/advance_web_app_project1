@@ -12,121 +12,145 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ValidateController extends Controller
 {
     /**
      * Register a new user
      */
-    public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'user_type' => 'required|in:Tenant,Owner',
-            'firstname' => 'required|string|max:100',
-            'middlename' => 'nullable|string|max:100',
-            'lastname' => 'required|string|max:100',
-            'extension_name' => 'nullable|string|max:50',
-            'email' => 'required|email|unique:accounts,email',
-            'mobile_number' => 'required|string|max:20|unique:accounts,mobile_number',
-            'username' => 'required|string|max:50|unique:accounts,username',
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string|min:8',
-            'province' => 'required|string|max:100',
-            'municipality' => 'required|string|max:100',
-            'barangay' => 'required|string|max:100',
-            'zipcode' => 'required|string|max:10',
-            'house_name' => 'nullable|string|max:255',
-            'dti_permit' => 'required_if:user_type,Owner|file|mimes:jpeg,png,jpg,pdf|max:5120',
-            'terms_agreed' => 'required|accepted',
-        ], [
-            'dti_permit.required_if' => 'DTI/Business Permit is required for property owners',
-            'terms_agreed.required' => 'You must agree to the terms and conditions',
-            'terms_agreed.accepted' => 'You must agree to the terms and conditions',
+
+public function register(Request $request)
+{
+    $validator = Validator::make($request->all(), [
+        'user_type' => 'required|in:Tenant,Owner',
+        'firstname' => 'required|string|max:100',
+        'middlename' => 'nullable|string|max:100',
+        'lastname' => 'required|string|max:100',
+        'extension_name' => 'nullable|string|max:50',
+        'email' => 'required|email|unique:accounts,email',
+        'mobile_number' => 'required|string|max:20|unique:accounts,mobile_number',
+        'username' => 'required|string|max:50|unique:accounts,username',
+        'password' => 'required|string|min:8|confirmed',
+        'password_confirmation' => 'required|string|min:8',
+        'province' => 'required|string|max:100',
+        'municipality' => 'required|string|max:100',
+        'barangay' => 'required|string|max:100',
+        'zipcode' => 'required|string|max:10',
+        'house_name' => 'nullable|string|max:255',
+        'dti_permit' => 'required_if:user_type,Owner|file|mimes:jpeg,png,jpg,pdf|max:5120',
+        'terms_agreed' => 'required|accepted',
+    ], [
+        'dti_permit.required_if' => 'DTI/Business Permit is required for property owners',
+        'terms_agreed.required' => 'You must agree to the terms and conditions',
+        'terms_agreed.accepted' => 'You must agree to the terms and conditions',
+    ]);
+
+    if ($validator->fails()) {
+        Log::error('Registration validation failed', [
+            'input' => $request->all(),
+            'errors' => $validator->errors()->toArray()
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        DB::beginTransaction();
-        try {
-            // Generate unique user ID
-            $userId = $this->generateUserId($request->user_type);
-            
-            // Handle DTI permit upload for owners
-            $dtiPermitPath = null;
-            if ($request->user_type === 'Owner' && $request->hasFile('dti_permit')) {
-                $file = $request->file('dti_permit');
-                $fileName = 'dti_' . $userId . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $dtiPermitPath = $file->storeAs('dti-permits', $fileName, 'public');
-            }
-
-            // Create user account
-            $user = Account::create([
-                'user_id' => $userId,
-                'firstname' => $request->firstname,
-                'middlename' => $request->middlename,
-                'lastname' => $request->lastname,
-                'extension_name' => $request->extension_name,
-                'email' => $request->email,
-                'mobile_number' => $request->mobile_number,
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
-                'province' => $request->province,
-                'municipality' => $request->municipality,
-                'barangay' => $request->barangay,
-                'zipcode' => $request->zipcode,
-                'house_name' => $request->house_name,
-                'dti_permit' => $dtiPermitPath ? basename($dtiPermitPath) : null,
-                'user_type' => $request->user_type,
-                'date_registered' => Carbon::now()->toDateString(),
-                'status' => 'Pending', // New registrations need admin approval
-                'view' => 'No',
-            ]);
-
-            // For owners, create default amenities
-            if ($request->user_type === 'Owner') {
-                $this->createDefaultAmenities($userId);
-            }
-
-            // Send registration notification to admin (in real app, this would be an email or notification)
-            $this->sendRegistrationNotification($user);
-
-            DB::commit();
-
-            // Generate token for immediate login after registration
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Registration successful! Your account is pending admin approval.',
-                'data' => [
-                    'user' => $user,
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                ],
-                'note' => 'Your account will be activated after admin approval. You will receive a notification once approved.'
-            ], 201);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Registration failed',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    DB::beginTransaction();
+    try {
+        Log::info('Registration started', ['input' => $request->all()]);
+
+        // Generate unique user ID
+        $userId = $this->generateUserId($request->user_type);
+
+        // Handle DTI permit upload
+        $dtiPermitPath = null;
+        if ($request->user_type === 'Owner' && $request->hasFile('dti_permit')) {
+            $file = $request->file('dti_permit');
+            $fileName = 'dti_' . $userId . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $dtiPermitPath = $file->storeAs('dti-permits', $fileName, 'public');
+
+            Log::info('DTI permit uploaded', ['path' => $dtiPermitPath]);
+        }
+
+        // Create user account
+        $user = Account::create([
+            'user_id' => $userId,
+            'firstname' => $request->firstname,
+            'middlename' => $request->middlename,
+            'lastname' => $request->lastname,
+            'extension_name' => $request->extension_name,
+            'email' => $request->email,
+            'mobile_number' => $request->mobile_number,
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'province' => $request->province,
+            'municipality' => $request->municipality,
+            'barangay' => $request->barangay,
+            'zipcode' => $request->zipcode,
+            'house_name' => $request->house_name,
+            'dti_permit' => $dtiPermitPath ? basename($dtiPermitPath) : null,
+            'user_type' => $request->user_type,
+            'date_registered' => Carbon::now()->toDateString(),
+            'status' => 'Pending',
+            'view' => 'No',
+        ]);
+
+
+        Log::info('User created successfully', ['user_id' => $user->id]);
+
+        if ($request->user_type === 'Owner') {
+            $this->createDefaultAmenities($userId);
+            Log::info('Default amenities created', ['user_id' => $userId]);
+        }
+
+        $this->sendRegistrationNotification($user);
+        Log::info('Registration notification sent', ['user_id' => $user->id]);
+
+        DB::commit();
+
+        // Token
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        Log::info('Registration completed successfully', ['user_id' => $user->id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registration successful! Your account is pending admin approval.',
+            'data' => [
+                'user' => $user,
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ]
+        ], 201);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        Log::error('Registration failed', [
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Registration failed',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     /**
      * Login user
      */
-    public function login(Request $request)
-    {
-         $validator = Validator::make($request->all(), [
+   public function login(Request $request)
+{
+    // Validate inputs
+    $validator = Validator::make($request->all(), [
         'login' => 'required_without:identifier,email,username|string',
         'identifier' => 'required_without:login,email,username|string',
         'email' => 'required_without:login,identifier,username|string|email',
@@ -141,71 +165,60 @@ class ValidateController extends Controller
         ], 422);
     }
 
-    // Determine which field contains the login value
+    // Determine the login value and field
     $loginValue = $request->login ?? $request->identifier ?? $request->email ?? $request->username;
     $loginField = $this->getLoginField($loginValue);
-    
+
+    // Correct credentials
     $credentials = [
         $loginField => $loginValue,
         'password' => $request->password,
     ];
-        $credentials = [
-            $loginField => $request->login,
-            'password' => $request->password,
-        ];
 
-        // Attempt authentication
-        if (!auth()->attempt($credentials)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
-
-        $user = Account::where($loginField, $request->login)->first();
-
-        // Check if account is approved
-        if ($user->status !== 'Approved') {
-            auth()->logout();
-            
-            $statusMessage = $user->status === 'Pending' 
-                ? 'Your account is pending admin approval.'
-                : ($user->status === 'Rejected' 
-                    ? 'Your account has been rejected. Please contact support.'
-                    : 'Your account is ' . strtolower($user->status));
-            
-            return response()->json([
-                'success' => false,
-                'message' => $statusMessage,
-                'status' => $user->status
-            ], 403);
-        }
-
-        // Update last seen/view
-        $user->updateLastSeen();
-
-        // Generate token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Log login activity (in real app, you'd have an activity log table)
-        // ActivityLog::create([
-        //     'user_id' => $user->user_id,
-        //     'action' => 'login',
-        //     'ip_address' => $request->ip(),
-        //     'user_agent' => $request->userAgent(),
-        // ]);
-
+    // Attempt login
+    if (!auth()->attempt($credentials)) {
         return response()->json([
-            'success' => true,
-            'message' => 'Login successful',
-            'data' => [
-                'user' => $user->load(relations: 'profileInfo'),
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]
-        ]);
+            'success' => false,
+            'message' => 'Invalid credentials'
+        ], 401);
     }
 
+    // Fetch the authenticated user
+    $user = Account::where($loginField, $loginValue)->first();
+
+    // Check approval status
+    if ($user->status !== 'Approved') {
+        auth()->logout();
+
+        $statusMessage = $user->status === 'Pending'
+            ? 'Your account is pending admin approval.'
+            : ($user->status === 'Rejected'
+                ? 'Your account has been rejected. Please contact support.'
+                : 'Your account is ' . strtolower($user->status));
+
+        return response()->json([
+            'success' => false,
+            'message' => $statusMessage,
+            'status' => $user->status
+        ], 403);
+    }
+
+    // Update last seen timestamp
+    $user->updateLastSeen();
+
+    // Generate token
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Login successful',
+        'data' => [
+            'user' => $user->load('profileInfo'),
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]
+    ]);
+}
     public function loginPage(){
         return redirect('/login-page');
     }

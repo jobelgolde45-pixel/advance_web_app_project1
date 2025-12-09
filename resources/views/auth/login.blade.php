@@ -161,35 +161,16 @@
                                 </div>
                             </div>
 
-                            <div class="flex items-start space-x-4">
-                                <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-shield-alt text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-xl mb-2">Secure Platform</h3>
-                                    <p class="text-indigo-200">Verified users and secure payment processing for peace of mind.</p>
-                                </div>
-                            </div>
+                        
                         </div>
                     </div>
 
-                    <!-- Testimonials -->
-                    <div class="mt-12 pt-8 border-t border-white/20">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                                <i class="fas fa-user text-xl"></i>
-                            </div>
-                            <div>
-                                <p class="italic">"Found my perfect apartment in Zone 1 within days!"</p>
-                                <p class="text-sm text-indigo-200 mt-1">— Maria Santos, Tenant</p>
-                            </div>
-                        </div>
-                    </div>
+                   
                 </div>
             </div>
         </div>
 
-        <!-- Demo Accounts Panel -->
+        <!-- Demo Accounts Panel
         <div class="mt-8 bg-white/10 backdrop-blur-sm rounded-2xl p-6 card-shadow">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-white font-bold text-lg">
@@ -202,7 +183,6 @@
             
             <div id="demoAccounts" class="hidden">
                 <div class="grid md:grid-cols-3 gap-4">
-                    <!-- Tenant Account -->
                     <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                         <div class="flex items-center mb-3">
                             <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
@@ -220,7 +200,6 @@
                         </div>
                     </div>
 
-                    <!-- Owner Account -->
                     <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                         <div class="flex items-center mb-3">
                             <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
@@ -238,7 +217,6 @@
                         </div>
                     </div>
 
-                    <!-- Admin Account -->
                     <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                         <div class="flex items-center mb-3">
                             <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center mr-3">
@@ -258,7 +236,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>  -->
 
     <!-- Forgot Password Modal -->
     <div id="forgotPasswordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden z-50">
@@ -362,10 +340,15 @@
         try {
             // Prepare login data
             const loginData = {
-                login: identifier, // Send as identifier
-                password: password,
-                remember: remember
-            };
+            login: identifier,
+            identifier: identifier,
+            email: identifier,
+            username: identifier,
+            password: password,
+            remember: remember
+        };
+
+
             
             // Get CSRF token from meta tag (if using Laravel)
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -796,9 +779,9 @@
                 // Redirect to appropriate dashboard if already logged in
                 const userType = user.user_type || user.role || 'tenant';
                 const redirects = {
-                    'admin': '/admin/dashboard',
-                    'owner': '/owner/dashboard',
-                    'tenant': '/tenant/dashboard'
+                    'admin': '/welcome',
+                    'owner': '/welcome',
+                    'tenant': '/welcome'
                 };
                 
                 const redirectUrl = redirects[userType.toLowerCase()];
