@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\AccommodationController;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ReservationController as ApiReservationController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ValidateController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,12 +14,12 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [ValidateController::class, 'register']);
+Route::post('/login', [ValidateController::class, 'login']);
 
 // Password reset
-Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
-Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+Route::post('/password/forgot', [ValidateController::class, 'forgotPassword']);
+Route::post('/password/reset', [ValidateController::class, 'resetPassword']);
 
 // Public accommodation listings
 Route::get('/accommodations', [AccommodationController::class, 'index']);

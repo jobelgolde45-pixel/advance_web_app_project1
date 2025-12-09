@@ -147,14 +147,14 @@
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
-                                <input type="text" name="firstname" required 
+                                <input type="text" name="firstname" id="firstname" required 
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="Enter your first name">
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
-                                <input type="text" name="middlename"
+                                <input type="text" name="middlename" id="middlename"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="Enter your middle name">
                             </div>
@@ -163,14 +163,14 @@
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
-                                <input type="text" name="lastname" required 
+                                <input type="text" name="lastname" id="lastname" required 
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="Enter your last name">
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Extension Name</label>
-                                <select name="extension_name" 
+                                <select name="extension_name" id="extension_name"
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">None</option>
                                     <option value="Jr.">Jr.</option>
@@ -185,7 +185,7 @@
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                                <input type="email" name="email" required 
+                                <input type="email" name="email" id="email" required 
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="your.email@example.com">
                                 <p class="text-sm text-gray-500 mt-1">We'll never share your email</p>
@@ -193,7 +193,7 @@
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
-                                <input type="tel" name="mobile_number" required 
+                                <input type="tel" name="mobile_number" id="mobile_number" required 
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="0912 345 6789">
                             </div>
@@ -256,7 +256,7 @@
                     <form id="addressForm" class="space-y-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">House/Building Name</label>
-                            <input type="text" name="house_name"
+                            <input type="text" name="house_name" id="house_name"
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                    placeholder="e.g., Villa Esperanza">
                         </div>
@@ -264,7 +264,7 @@
                         <div class="grid md:grid-cols-3 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Province *</label>
-                                <select name="province" required 
+                                <select name="province" id="province" required 
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         onchange="loadMunicipalities(this.value)">
                                     <option value="">Select Province</option>
@@ -277,20 +277,20 @@
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Municipality/City *</label>
-                                <select name="municipality" required 
+                                <select name="municipality" id="municipality" required 
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         onchange="loadBarangays(this.value)">
                                     <option value="">Select Municipality</option>
                                     <option value="Bulan" selected>Bulan</option>
                                     <option value="Sorsogon City">Sorsogon City</option>
-                                    <option value="Bulan">Irosin</option>
+                                    <option value="Irosin">Irosin</option>
                                     <option value="Gubat">Gubat</option>
                                 </select>
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Barangay *</label>
-                                <select name="barangay" required 
+                                <select name="barangay" id="barangay" required 
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                     <option value="">Select Barangay</option>
                                     <option value="Zone 1">Zone 1</option>
@@ -306,7 +306,7 @@
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Zip Code *</label>
-                                <input type="text" name="zipcode" required 
+                                <input type="text" name="zipcode" id="zipcode" required 
                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                        placeholder="4706">
                             </div>
@@ -332,7 +332,7 @@
                         <!-- Location Map (Optional) -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Location (Optional)</label>
-                            <textarea name="location" rows="3" 
+                            <textarea name="location" id="location" rows="3" 
                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                       placeholder="Additional location details or landmarks"></textarea>
                         </div>
@@ -357,7 +357,7 @@
                     <form id="credentialsForm" class="space-y-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Username *</label>
-                            <input type="text" name="username" required 
+                            <input type="text" name="username" id="username" required 
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                    placeholder="Choose a username">
                             <p class="text-sm text-gray-500 mt-1">This will be your unique identifier</p>
@@ -367,7 +367,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
                                 <div class="relative">
-                                    <input type="password" name="password" required 
+                                    <input type="password" name="password" id="password" required 
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                                            placeholder="Enter password">
                                     <button type="button" onclick="togglePassword('password')" 
@@ -394,7 +394,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label>
                                 <div class="relative">
-                                    <input type="password" name="password_confirmation" required 
+                                    <input type="password" name="password_confirmation" id="password_confirmation" required 
                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                                            placeholder="Confirm password">
                                     <button type="button" onclick="togglePassword('password_confirmation')" 
@@ -408,9 +408,9 @@
                         <!-- Terms and Conditions -->
                         <div class="bg-gray-50 p-4 rounded-lg">
                             <div class="flex items-start">
-                                <input type="checkbox" name="terms" id="terms" required 
+                                <input type="checkbox" name="terms_agreed" id="terms_agreed" required 
                                        class="mt-1 mr-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <label for="terms" class="text-sm text-gray-700">
+                                <label for="terms_agreed" class="text-sm text-gray-700">
                                     I agree to the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>. 
                                     I understand that my information will be used in accordance with the system's policies and for verification purposes.
                                 </label>
@@ -457,545 +457,489 @@
         </div>
     </div>
 
-    <!-- Add this button somewhere in your register page for testing -->
-<button onclick="testAPI()" 
-        class="fixed bottom-4 right-4 bg-red-500 text-white px-3 py-2 rounded-lg text-sm">
-    <i class="fas fa-bug mr-1"></i> Test API Connection
-</button>
+    <!-- Hidden user_type field for form submission -->
+    <input type="hidden" id="user_type" value="">
 
     <script>
         // Registration Data Object
-let registrationData = {
-    user_type: '',
-    firstname: '',
-    middlename: '',
-    lastname: '',
-    extension_name: '',
-    province: 'Sorsogon',
-    municipality: 'Bulan',
-    barangay: '',
-    zipcode: '',
-    email: '',
-    mobile_number: '',
-    dti_permit: '',
-    location: '',
-    profile: '',
-    house_name: '',
-    username: '',
-    password: '',
-    status: 'Pending',
-    view: 'No'
-};
+        let registrationData = {
+            user_type: '',
+            firstname: '',
+            middlename: '',
+            lastname: '',
+            extension_name: '',
+            province: 'Sorsogon',
+            municipality: 'Bulan',
+            barangay: '',
+            zipcode: '',
+            email: '',
+            mobile_number: '',
+            dti_permit: '',
+            location: '',
+            profile: '',
+            house_name: '',
+            username: '',
+            password: '',
+            status: 'Pending',
+            view: 'No'
+        };
 
-let currentStep = 1;
+        let currentStep = 1;
 
-// Navigation Functions
-function selectAccountType(type) {
-    registrationData.user_type = type;
-    
-    // Highlight selected card
-    document.querySelectorAll('[onclick^="selectAccountType"]').forEach(card => {
-        card.classList.remove('border-blue-400', 'border-green-400', 'border-purple-400', 'shadow-md');
-        card.classList.add('border-blue-200', 'border-green-200', 'border-purple-200');
-    });
-    
-    // Highlight selected
-    const colorMap = {
-        'Tenant': 'blue',
-        'Owner': 'green',
-        'Admin': 'purple'
-    };
-    
-    event.currentTarget.classList.remove(`border-${colorMap[type]}-200`);
-    event.currentTarget.classList.add(`border-${colorMap[type]}-400`, 'shadow-md');
-    
-    // Show DTI section for owners
-    const dtiSection = document.getElementById('dtiSection');
-    if (type === 'Owner') {
-        dtiSection.classList.remove('hidden');
-    } else {
-        dtiSection.classList.add('hidden');
-    }
-}
-
-function nextStep() {
-    if (currentStep === 1 && !registrationData.user_type) {
-        showResponse('Please select an account type', 'error');
-        return;
-    }
-    
-    changeStep(currentStep + 1);
-}
-
-function prevStep() {
-    changeStep(currentStep - 1);
-}
-
-function changeStep(step) {
-    if (step > currentStep) {
-        if (!validateCurrentStep()) {
-            return;
-        }
-    }
-    
-    // Hide current step
-    document.getElementById(`step${currentStep}`).classList.remove('active');
-    
-    // Update progress indicators
-    updateProgressIndicators(currentStep, step);
-    
-    // Show new step
-    document.getElementById(`step${step}`).classList.add('active');
-    currentStep = step;
-    
-    // Scroll to top of form
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function updateProgressIndicators(oldStep, newStep) {
-    const indicators = document.querySelectorAll('.step-indicator');
-    
-    // Update numbers and colors
-    indicators.forEach((indicator, index) => {
-        const numberDiv = indicator.querySelector('div');
-        const textSpan = indicator.querySelector('span');
-        
-        if (index < newStep - 1) {
-            // Completed steps
-            numberDiv.className = 'w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold mb-1';
-            textSpan.className = 'text-sm font-medium text-gray-700';
-        } else if (index === newStep - 1) {
-            // Current step
-            numberDiv.className = 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold mb-1';
-            textSpan.className = 'text-sm font-medium text-gray-700';
-        } else {
-            // Future steps
-            numberDiv.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold mb-1';
-            textSpan.className = 'text-sm font-medium text-gray-500';
-        }
-    });
-}
-
-function validateCurrentStep() {
-    switch(currentStep) {
-        case 1:
-            return !!registrationData.user_type;
-        case 2:
-            return validateStep2(); // Changed function name
-        case 3:
-            return validateStep3(); // Changed function name
-        default:
-            return true;
-    }
-}
-
-// Step 2 validation (Personal Info)
-function validateStep2() {
-    const form = document.getElementById('personalInfoForm');
-    const required = ['firstname', 'lastname', 'email', 'mobile_number'];
-    
-    for (let field of required) {
-        const input = form.querySelector(`[name="${field}"]`);
-        if (!input.value.trim()) {
-            showResponse(`Please fill in ${field.replace('_', ' ')}`, 'error');
-            input.focus();
-            return false;
-        }
-    }
-    
-    // Validate email
-    const email = form.querySelector('[name="email"]').value;
-    if (!validateEmail(email)) {
-        showResponse('Please enter a valid email address', 'error');
-        return false;
-    }
-    
-    // Validate mobile number format
-    const mobileNumber = form.querySelector('[name="mobile_number"]').value;
-    if (!validateMobileNumber(mobileNumber)) {
-        showResponse('Please enter a valid mobile number (e.g., 09123456789)', 'error');
-        return false;
-    }
-    
-    // Save data
-    saveStepData(2);
-    return true;
-}
-
-// Step 3 validation (Address Info)
-function validateStep3() {
-    const form = document.getElementById('addressForm');
-    const required = ['province', 'municipality', 'barangay', 'zipcode'];
-    
-    for (let field of required) {
-        const input = form.querySelector(`[name="${field}"]`);
-        if (!input.value.trim()) {
-            showResponse(`Please select ${field.replace('_', ' ')}`, 'error');
-            input.focus();
-            return false;
-        }
-    }
-    
-    // Validate zip code format (Philippines zip codes are 4 digits)
-    const zipcode = form.querySelector('[name="zipcode"]').value;
-    if (!/^\d{4}$/.test(zipcode)) {
-        showResponse('Please enter a valid 4-digit zip code', 'error');
-        return false;
-    }
-    
-    // Save data
-    saveStepData(3);
-    return true;
-}
-
-// Separate function for button click validation
-function validatePersonalInfo() {
-    if (validateStep2()) {
-        changeStep(3);
-    }
-}
-
-function validateAddressInfo() {
-    if (validateStep3()) {
-        changeStep(4);
-    }
-}
-
-function saveStepData(step) {
-    let form;
-    switch(step) {
-        case 2:
-            form = document.getElementById('personalInfoForm');
-            break;
-        case 3:
-            form = document.getElementById('addressForm');
-            break;
-        case 4:
-            form = document.getElementById('credentialsForm');
-            break;
-    }
-    
-    if (form) {
-        const formData = new FormData(form);
-        for (let [key, value] of formData.entries()) {
-            registrationData[key] = value;
-        }
-    }
-}
-
-async function submitRegistration() {
-    const form = document.getElementById('credentialsForm');
-    
-    // Validate credentials
-    const username = form.querySelector('[name="username"]').value;
-    const password = form.querySelector('[name="password"]').value;
-    const confirmPassword = form.querySelector('[name="password_confirmation"]').value;
-    
-    if (!username || !password) {
-        showResponse('Please fill in all required fields', 'error');
-        return;
-    }
-    
-    if (password !== confirmPassword) {
-        showResponse('Passwords do not match', 'error');
-        return;
-    }
-    
-    if (password.length < 8) {
-        showResponse('Password must be at least 8 characters', 'error');
-        return;
-    }
-    
-    // Check for at least one uppercase letter
-    if (!/[A-Z]/.test(password)) {
-        showResponse('Password must contain at least one uppercase letter', 'error');
-        return;
-    }
-    
-    // Check for at least one number
-    if (!/\d/.test(password)) {
-        showResponse('Password must contain at least one number', 'error');
-        return;
-    }
-    
-    if (!form.querySelector('#terms').checked) {
-        showResponse('Please agree to the terms and conditions', 'error');
-        return;
-    }
-    
-    // Save credentials
-    saveStepData(4);
-    
-    // Generate user_id (format: TYPE-YYYYMMDD-XXXX)
-    const date = new Date().toISOString().slice(0,10).replace(/-/g, '');
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    registrationData.user_id = `${registrationData.user_type.charAt(0)}-${date}-${random}`;
-    registrationData.date_registered = new Date().toISOString().slice(0,10);
-    
-    // Show loading
-    showResponse('Creating your account...', 'loading');
-    
-    try {
-        // Prepare form data for file uploads
-        const formData = new FormData();
-        for (const key in registrationData) {
-            // Skip empty values to avoid sending empty strings
-            if (registrationData[key] !== '') {
-                formData.append(key, registrationData[key]);
+        // Navigation Functions
+        function selectAccountType(type) {
+            registrationData.user_type = type;
+            document.getElementById('user_type').value = type;
+            
+            // Highlight selected card
+            document.querySelectorAll('[onclick^="selectAccountType"]').forEach(card => {
+                card.classList.remove('border-blue-400', 'border-green-400', 'border-purple-400', 'shadow-md');
+                card.classList.add('border-blue-200', 'border-green-200', 'border-purple-200');
+            });
+            
+            // Highlight selected
+            const colorMap = {
+                'Tenant': 'blue',
+                'Owner': 'green',
+                'Admin': 'purple'
+            };
+            
+            event.currentTarget.classList.remove(`border-${colorMap[type]}-200`);
+            event.currentTarget.classList.add(`border-${colorMap[type]}-400`, 'shadow-md');
+            
+            // Show DTI section for owners
+            const dtiSection = document.getElementById('dtiSection');
+            if (type === 'Owner') {
+                dtiSection.classList.remove('hidden');
+            } else {
+                dtiSection.classList.add('hidden');
             }
         }
-        
-        // Add file uploads if present
-        const dtiFile = document.getElementById('dti_permit');
-        if (dtiFile && dtiFile.files[0]) {
-            formData.append('dti_permit_file', dtiFile.files[0]);
-        }
-        
-        const profileFile = document.getElementById('profile');
-        if (profileFile && profileFile.files[0]) {
-            formData.append('profile_file', profileFile.files[0]);
-        }
-        
-        console.log('Sending registration data:', Object.fromEntries(formData.entries()));
-        
-        // Submit to API - Use correct endpoint
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                // Don't set Content-Type for FormData - let browser set it with boundary
-            },
-            body: formData
-        });
-        
-        console.log('Response status:', response.status);
-        console.log('Response headers:', [...response.headers.entries()]);
-        
-        const result = await response.json().catch(async (e) => {
-            // If JSON parsing fails, try to get text response
-            const text = await response.text();
-            console.error('Failed to parse JSON:', text);
-            throw new Error(`Server response: ${text}`);
-        });
-        
-        console.log('Response data:', result);
-        
-        if (response.ok) {
-            showResponse('Account created successfully! Redirecting to login...', 'success');
+
+        function nextStep() {
+            if (currentStep === 1 && !registrationData.user_type) {
+                showResponse('Please select an account type', 'error');
+                return;
+            }
             
-            // Auto-login or redirect
+            changeStep(currentStep + 1);
+        }
+
+        function prevStep() {
+            changeStep(currentStep - 1);
+        }
+
+        function changeStep(step) {
+            if (step > currentStep) {
+                if (!validateCurrentStep()) {
+                    return;
+                }
+            }
+            
+            // Hide current step
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            
+            // Update progress indicators
+            updateProgressIndicators(currentStep, step);
+            
+            // Show new step
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            
+            // Scroll to top of form
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateProgressIndicators(oldStep, newStep) {
+            const indicators = document.querySelectorAll('.step-indicator');
+            
+            // Update numbers and colors
+            indicators.forEach((indicator, index) => {
+                const numberDiv = indicator.querySelector('div');
+                const textSpan = indicator.querySelector('span');
+                
+                if (index < newStep - 1) {
+                    // Completed steps
+                    numberDiv.className = 'w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold mb-1';
+                    textSpan.className = 'text-sm font-medium text-gray-700';
+                } else if (index === newStep - 1) {
+                    // Current step
+                    numberDiv.className = 'w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold mb-1';
+                    textSpan.className = 'text-sm font-medium text-gray-700';
+                } else {
+                    // Future steps
+                    numberDiv.className = 'w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-semibold mb-1';
+                    textSpan.className = 'text-sm font-medium text-gray-500';
+                }
+            });
+        }
+
+        function validateCurrentStep() {
+            switch(currentStep) {
+                case 1:
+                    return !!registrationData.user_type;
+                case 2:
+                    return validateStep2();
+                case 3:
+                    return validateStep3();
+                default:
+                    return true;
+            }
+        }
+
+        // Step 2 validation (Personal Info)
+        function validateStep2() {
+            const required = ['firstname', 'lastname', 'email', 'mobile_number'];
+            
+            for (let field of required) {
+                const input = document.getElementById(field);
+                if (!input || !input.value.trim()) {
+                    showResponse(`Please fill in ${field.replace('_', ' ')}`, 'error');
+                    input?.focus();
+                    return false;
+                }
+            }
+            
+            // Validate email
+            const email = document.getElementById('email').value;
+            if (!validateEmail(email)) {
+                showResponse('Please enter a valid email address', 'error');
+                return false;
+            }
+            
+            // Validate mobile number format
+            const mobileNumber = document.getElementById('mobile_number').value;
+            if (!validateMobileNumber(mobileNumber)) {
+                showResponse('Please enter a valid mobile number (e.g., 09123456789)', 'error');
+                return false;
+            }
+            
+            // Save data
+            saveStepData(2);
+            return true;
+        }
+
+        // Step 3 validation (Address Info)
+        function validateStep3() {
+            const required = ['province', 'municipality', 'barangay', 'zipcode'];
+            
+            for (let field of required) {
+                const input = document.getElementById(field);
+                if (!input || !input.value.trim()) {
+                    showResponse(`Please select ${field.replace('_', ' ')}`, 'error');
+                    input?.focus();
+                    return false;
+                }
+            }
+            
+            // Validate zip code format (Philippines zip codes are 4 digits)
+            const zipcode = document.getElementById('zipcode').value;
+            if (!/^\d{4}$/.test(zipcode)) {
+                showResponse('Please enter a valid 4-digit zip code', 'error');
+                return false;
+            }
+            
+            // Save data
+            saveStepData(3);
+            return true;
+        }
+
+        // Separate function for button click validation
+        function validatePersonalInfo() {
+            if (validateStep2()) {
+                changeStep(3);
+            }
+        }
+
+        function validateAddressInfo() {
+            if (validateStep3()) {
+                changeStep(4);
+            }
+        }
+
+        function saveStepData(step) {
+            // Save data to registrationData object
+            const fields = {
+                2: ['firstname', 'middlename', 'lastname', 'extension_name', 'email', 'mobile_number'],
+                3: ['province', 'municipality', 'barangay', 'zipcode', 'house_name', 'location'],
+                4: ['username', 'password', 'password_confirmation']
+            };
+
+            if (fields[step]) {
+                fields[step].forEach(field => {
+                    const element = document.getElementById(field);
+                    if (element) {
+                        registrationData[field] = element.value;
+                    }
+                });
+            }
+        }
+
+        async function submitRegistration() {
+            // Validate step 4 fields
+            const requiredFields = ['username', 'password', 'password_confirmation'];
+            for (let field of requiredFields) {
+                const input = document.getElementById(field);
+                if (!input || !input.value.trim()) {
+                    showResponse(`Please fill in ${field.replace('_', ' ')}`, 'error');
+                    input?.focus();
+                    return;
+                }
+            }
+
+            // Check if passwords match
+            const password = document.getElementById('password').value;
+            const passwordConfirmation = document.getElementById('password_confirmation').value;
+            if (password !== passwordConfirmation) {
+                showResponse('Passwords do not match', 'error');
+                return;
+            }
+
+            // Check terms agreement
+            const termsAgreed = document.getElementById('terms_agreed');
+            if (!termsAgreed || !termsAgreed.checked) {
+                showResponse('You must agree to the terms and conditions', 'error');
+                return;
+            }
+
+            // Collect all form data
+            const formData = new FormData();
+
+            // User type
+            formData.append('user_type', registrationData.user_type || document.getElementById('user_type').value);
+
+            // Personal info
+            formData.append('firstname', document.getElementById('firstname').value);
+            formData.append('middlename', document.getElementById('middlename').value);
+            formData.append('lastname', document.getElementById('lastname').value);
+            formData.append('extension_name', document.getElementById('extension_name').value);
+            formData.append('email', document.getElementById('email').value);
+            formData.append('mobile_number', document.getElementById('mobile_number').value);
+
+            // Address info
+            formData.append('province', document.getElementById('province').value);
+            formData.append('municipality', document.getElementById('municipality').value);
+            formData.append('barangay', document.getElementById('barangay').value);
+            formData.append('zipcode', document.getElementById('zipcode').value);
+            formData.append('house_name', document.getElementById('house_name').value);
+            formData.append('location', document.getElementById('location').value);
+
+            // Credentials
+            formData.append('username', document.getElementById('username').value);
+            formData.append('password', document.getElementById('password').value);
+            formData.append('password_confirmation', document.getElementById('password_confirmation').value);
+            formData.append('terms_agreed', termsAgreed.checked ? '1' : '');
+
+            // DTI permit for owners
+            if (registrationData.user_type === 'Owner') {
+                const dtiPermitInput = document.getElementById('dti_permit');
+                if (dtiPermitInput && dtiPermitInput.files.length > 0) {
+                    formData.append('dti_permit', dtiPermitInput.files[0]);
+                }
+            }
+
+            // Profile photo
+            const profileInput = document.getElementById('profile');
+            if (profileInput && profileInput.files.length > 0) {
+                formData.append('profile', profileInput.files[0]);
+            }
+
+            // Show loading
+            showResponse('Creating your account...', 'loading');
+
+            // Send to backend
+            try {
+                let response = await fetch("/api/register", {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                let result = await response.json();
+
+                if (response.ok) {
+                    showResponse('Account created successfully! Redirecting to login...', 'success');
+                    // Redirect to login after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/login';
+                    }, 2000);
+                } else {
+                    // Show validation errors
+                    if (result.errors) {
+                        const errorMessages = Object.values(result.errors).flat().join(', ');
+                        showResponse(`Registration failed: ${errorMessages}`, 'error');
+                    } else {
+                        showResponse(`Registration failed: ${result.message || 'Unknown error'}`, 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showResponse('Something went wrong. Please try again.', 'error');
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validateMobileNumber(mobile) {
+            // Philippine mobile number format: 09XXXXXXXXX or +639XXXXXXXXX
+            const re = /^(09|\+639)\d{9}$/;
+            // Remove spaces and dashes for validation
+            const cleanMobile = mobile.replace(/[\s\-]/g, '');
+            return re.test(cleanMobile);
+        }
+
+        function previewProfileImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('profilePreview');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function togglePassword(fieldName) {
+            const input = document.getElementById(fieldName);
+            if (!input) return;
+            
+            const button = input.nextElementSibling;
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        function loadMunicipalities(province) {
+            console.log('Loading municipalities for:', province);
+        }
+
+        function loadBarangays(municipality) {
+            console.log('Loading barangays for:', municipality);
+        }
+
+        function showResponse(message, type = 'info') {
+            const responseDiv = document.getElementById('responseMessage');
+            const iconDiv = document.getElementById('responseIcon');
+            const title = document.getElementById('responseTitle');
+            const text = document.getElementById('responseText');
+            
+            const config = {
+                success: { 
+                    icon: '<i class="fas fa-check-circle text-green-500 text-xl"></i>',
+                    title: 'Success!',
+                    color: 'text-green-700'
+                },
+                error: { 
+                    icon: '<i class="fas fa-exclamation-circle text-red-500 text-xl"></i>',
+                    title: 'Error!',
+                    color: 'text-red-700'
+                },
+                info: { 
+                    icon: '<i class="fas fa-info-circle text-blue-500 text-xl"></i>',
+                    title: 'Info',
+                    color: 'text-blue-700'
+                },
+                loading: { 
+                    icon: '<i class="fas fa-spinner fa-spin text-blue-500 text-xl"></i>',
+                    title: 'Processing...',
+                    color: 'text-blue-700'
+                }
+            };
+            
+            const cfg = config[type] || config.info;
+            
+            iconDiv.innerHTML = cfg.icon;
+            title.textContent = cfg.title;
+            title.className = cfg.color;
+            text.textContent = message;
+            
+            responseDiv.classList.remove('hidden');
+            
+            // Auto-hide for non-error messages
+            if (type !== 'error' && type !== 'loading') {
+                setTimeout(() => {
+                    hideResponse();
+                }, 5000);
+            }
+        }
+
+        function hideResponse() {
+            document.getElementById('responseMessage').classList.add('hidden');
+        }
+
+        function fillSampleData() {
+            const sampleData = {
+                user_type: 'Tenant',
+                firstname: 'Juan',
+                middlename: 'Santos',
+                lastname: 'Dela Cruz',
+                extension_name: 'Jr.',
+                province: 'Sorsogon',
+                municipality: 'Bulan',
+                barangay: 'Zone 1',
+                zipcode: '4706',
+                email: 'juan.delacruz@example.com',
+                mobile_number: '09123456789',
+                house_name: 'Villa Esperanza',
+                username: 'juan.delacruz',
+                password: 'Password123',
+                password_confirmation: 'Password123'
+            };
+            
+            // Fill forms with sample data
+            selectAccountType(sampleData.user_type);
+            
             setTimeout(() => {
-                window.location.href = '/login';
-            }, 2000);
-        } else {
-            const errorMessage = result.message || 
-                               result.error || 
-                               `Registration failed (Status: ${response.status})`;
-            showResponse(errorMessage, 'error');
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        showResponse(`Registration failed: ${error.message}`, 'error');
-    }
-}
-
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-function validateMobileNumber(mobile) {
-    // Philippine mobile number format: 09XXXXXXXXX or +639XXXXXXXXX
-    const re = /^(09|\+639)\d{9}$/;
-    // Remove spaces and dashes for validation
-    const cleanMobile = mobile.replace(/[\s\-]/g, '');
-    return re.test(cleanMobile);
-}
-
-function previewProfileImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('profilePreview');
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-        }
-        reader.readAsDataURL(file);
-    }
-}
-
-function togglePassword(fieldName) {
-    const input = document.querySelector(`[name="${fieldName}"]`);
-    const button = input.nextElementSibling;
-    const icon = button.querySelector('i');
-    
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        input.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
-}
-
-function loadMunicipalities(province) {
-    console.log('Loading municipalities for:', province);
-}
-
-function loadBarangays(municipality) {
-    console.log('Loading barangays for:', municipality);
-}
-
-function showResponse(message, type = 'info') {
-    const responseDiv = document.getElementById('responseMessage');
-    const iconDiv = document.getElementById('responseIcon');
-    const title = document.getElementById('responseTitle');
-    const text = document.getElementById('responseText');
-    
-    const config = {
-        success: { 
-            icon: '<i class="fas fa-check-circle text-green-500 text-xl"></i>',
-            title: 'Success!',
-            color: 'text-green-700'
-        },
-        error: { 
-            icon: '<i class="fas fa-exclamation-circle text-red-500 text-xl"></i>',
-            title: 'Error!',
-            color: 'text-red-700'
-        },
-        info: { 
-            icon: '<i class="fas fa-info-circle text-blue-500 text-xl"></i>',
-            title: 'Info',
-            color: 'text-blue-700'
-        },
-        loading: { 
-            icon: '<i class="fas fa-spinner fa-spin text-blue-500 text-xl"></i>',
-            title: 'Processing...',
-            color: 'text-blue-700'
-        }
-    };
-    
-    const cfg = config[type] || config.info;
-    
-    iconDiv.innerHTML = cfg.icon;
-    title.textContent = cfg.title;
-    title.className = cfg.color;
-    text.textContent = message;
-    
-    responseDiv.classList.remove('hidden');
-    
-    // Auto-hide for non-error messages
-    if (type !== 'error') {
-        setTimeout(() => {
-            hideResponse();
-        }, 5000);
-    }
-}
-
-function hideResponse() {
-    document.getElementById('responseMessage').classList.add('hidden');
-}
-
-
-function fillSampleData() {
-
-    const sampleData = {
-        user_type: 'Tenant',
-        firstname: 'Juan',
-        middlename: 'Santos',
-        lastname: 'Dela Cruz',
-        extension_name: 'Jr.',
-        province: 'Sorsogon',
-        municipality: 'Bulan',
-        barangay: 'Zone 1',
-        zipcode: '4706',
-        email: 'juan.delacruz@example.com',
-        mobile_number: '09123456789',
-        house_name: 'Villa Esperanza',
-        username: 'juan.delacruz',
-        password: 'Password123',
-        password_confirmation: 'Password123'
-    };
-    
-    // Fill forms with sample data
-    selectAccountType(sampleData.user_type);
-    
-    setTimeout(() => {
-        const forms = ['personalInfoForm', 'addressForm', 'credentialsForm'];
-        forms.forEach(formId => {
-            const form = document.getElementById(formId);
-            if (form) {
                 Object.keys(sampleData).forEach(key => {
-                    const input = form.querySelector(`[name="${key}"]`);
+                    const input = document.getElementById(key);
                     if (input) {
                         input.value = sampleData[key];
                     }
                 });
-            }
-        });
-        
-        // Check terms
-        document.getElementById('terms').checked = true;
-        
-        showResponse('Sample data loaded. You can now test the form.', 'info');
-    }, 100);
-}
+                
+                // Check terms
+                const terms = document.getElementById('terms_agreed');
+                if (terms) {
+                    terms.checked = true;
+                }
+                
+                showResponse('Sample data loaded. You can now test the form.', 'info');
+            }, 100);
+        }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const devButton = document.createElement('button');
-    devButton.className = 'fixed bottom-4 left-4 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm opacity-50 hover:opacity-100';
-    devButton.innerHTML = '<i class="fas fa-vial mr-1"></i> Load Sample Data';
-    devButton.onclick = fillSampleData;
-    document.body.appendChild(devButton);
-    
-    document.querySelector('[name="province"]').value = 'Sorsogon';
-    document.querySelector('[name="municipality"]').value = 'Bulan';
-    
-    document.querySelector('[name="firstname"]')?.focus();
-});
-
-async function testAPI() {
-    try {
-        console.log('Testing API connection...');
-        
-        // Test 1: Check if API endpoint exists
-        const testResponse = await fetch('/api/register', {
-            method: 'OPTIONS', // Preflight request
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add dev button for testing
+            const devButton = document.createElement('button');
+            devButton.className = 'fixed bottom-4 left-4 bg-gray-800 text-white px-3 py-2 rounded-lg text-sm opacity-50 hover:opacity-100';
+            devButton.innerHTML = '<i class="fas fa-vial mr-1"></i> Load Sample Data';
+            devButton.onclick = fillSampleData;
+            document.body.appendChild(devButton);
+            
+            // Set default values
+            const province = document.getElementById('province');
+            const municipality = document.getElementById('municipality');
+            if (province) province.value = 'Sorsogon';
+            if (municipality) municipality.value = 'Bulan';
+            
+            // Focus on first name field
+            const firstname = document.getElementById('firstname');
+            if (firstname) firstname.focus();
         });
-        console.log('OPTIONS response:', testResponse.status);
-        
-        // Test 2: Check with simple POST
-        const testData = {
-            firstname: 'Test',
-            lastname: 'User',
-            email: 'test@example.com',
-            password: 'Password123',
-            password_confirmation: 'Password123',
-            user_type: 'Tenant'
-        };
-        
-        const response = await fetch('/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify(testData)
-        });
-        
-        console.log('POST response status:', response.status);
-        const result = await response.json();
-        console.log('POST response:', result);
-        
-        showResponse(`API Test: ${response.status} - ${JSON.stringify(result)}`, 'info');
-        
-    } catch (error) {
-        console.error('API Test Error:', error);
-        showResponse(`API Test Failed: ${error.message}`, 'error');
-    }
-}
     </script>
 </body>
 </html>
