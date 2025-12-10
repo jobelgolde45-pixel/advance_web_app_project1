@@ -336,47 +336,20 @@ public function updateProfile(Request $request)
      * Get user notifications
      */
     public function getNotifications(Request $request)
-    {
-        $user = auth()->user();
-        $perPage = $request->query('per_page', 20);
-        $unreadOnly = $request->query('unread_only', false);
-        
-        $query = $user->receivedNotifications()
-            ->orderBy('date_sent', 'desc');
-        
-        if ($unreadOnly) {
-            $query->where('seen', 'unsee');
-        }
-        
-        $notifications = $query->paginate($perPage);
-        
-        // Transform notifications
-        $notifications->getCollection()->transform(function($notification) {
-            $sender = $notification->senderUser;
-            return [
-                'id' => $notification->notification_id,
-                'message' => $notification->notification_message,
-                'preview' => $notification->preview,
-                'type' => $notification->type,
-                'sender' => $sender ? [
-                    'id' => $sender->user_id,
-                    'name' => $sender->full_name,
-                    'type' => $sender->user_type
-                ] : null,
-                'seen' => $notification->seen,
-                'is_unread' => $notification->isUnread(),
-                'date_sent' => $notification->date_sent,
-                'formatted_date' => $notification->formatted_date,
-                'time_ago' => $notification->date_sent->diffForHumans(),
-            ];
-        });
-        
-        return response()->json([
-            'success' => true,
-            'data' => $notifications,
-            'unread_count' => $user->unread_notifications_count
-        ]);
-    }
+{
+    $user = auth()->user();
+    
+    
+    $notifications = Notification::all();
+    
+    
+    
+    return response()->json([
+        'success' => true,
+        'data' => $notifications, 
+        'unread_count' => $user->unread_notifications_count
+    ]);
+}
 
     /**
      * Mark notification as read
@@ -939,76 +912,23 @@ public function updateProfile(Request $request)
     /**
      * Get all users (Admin only)
      */
-    public function getAllUsers(Request $request)
-    {
-        $user = auth()->user();
-        
-        if (!$user->isAdmin()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Admin access required'
-            ], 403);
-        }
-        
-        $perPage = $request->query('per_page', 20);
-        $userType = $request->query('user_type');
-        $status = $request->query('status');
-        $search = $request->query('search');
-        
-        $query = Account::query();
-        
-        if ($userType) {
-            $query->where('user_type', $userType);
-        }
-        
-        if ($status) {
-            $query->where('status', $status);
-        }
-        
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('firstname', 'like', '%' . $search . '%')
-                  ->orWhere('lastname', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%')
-                  ->orWhere('mobile_number', 'like', '%' . $search . '%')
-                  ->orWhere('user_id', 'like', '%' . $search . '%');
-            });
-        }
-        
-        $users = $query->orderBy('date_registered', 'desc')
-            ->paginate($perPage);
-        
-        // Add additional statistics
-        $users->getCollection()->transform(function($user) {
-            $userData = $user->toArray();
+   public function getAllUsers(Request $request)
+{
+    
+    $users = Account::all();
+    Log::info(['users: ' => $users]);
+        return response()
+            ->json([
+                'success' => true,
+                'data' => $users,
+            ])
+            ->header('Content-Type', 'application/json')
+            ->header('X-Content-Type-Options', 'nosniff');
             
-            if ($user->isOwner()) {
-                $userData['accommodations_count'] = $user->accommodations()->count();
-                $userData['active_reservations'] = $user->ownerReservations()
-                    ->where('reservation_status', 'Approved')
-                    ->whereDate('end_date', '>=', now())
-                    ->count();
-            } elseif ($user->isTenant()) {
-                $userData['reservations_count'] = $user->tenantReservations()->count();
-                $userData['active_reservations'] = $user->tenantReservations()
-                    ->where('reservation_status', 'Approved')
-                    ->whereDate('end_date', '>=', now())
-                    ->count();
-            }
-            
-            return $userData;
-        });
-        
-        return response()->json([
-            'success' => true,
-            'data' => $users,
-            'filters' => [
-                'user_type' => $userType,
-                'status' => $status,
-                'search' => $search
-            ]
-        ]);
-    }
+    
+
+}
+
 
     /**
      * Update user status (Admin only)

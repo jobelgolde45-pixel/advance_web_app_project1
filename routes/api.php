@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [ValidateController::class, 'register']);
 Route::post('/login', [ValidateController::class, 'login']);
+Route::post('/logout', [ValidateController::class, 'logout'])->name('logout');
 
 // Password reset
 Route::post('/password/forgot', [ValidateController::class, 'forgotPassword']);

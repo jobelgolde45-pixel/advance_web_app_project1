@@ -100,15 +100,13 @@
                     </div>
                 </div>
                 
-                <!-- Owner Routes -->
+                <!-- Owner Routes 
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-4 text-orange-600">
                         <i class="fas fa-user-tie mr-2"></i>Owner Management (Protected)
                     </h2>
                     <div class="space-y-3">
-                        <button onclick="fetchProtected('GET', '/api/owner/accommodations')" class="w-full py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
-                            Get Owner Accommodations
-                        </button>
+                       
                         
                         <h4 class="font-medium mt-4">Create Accommodation</h4>
                         <form onsubmit="submitProtectedForm(event, 'POST', '/api/owner/accommodations')" class="space-y-2">
@@ -136,7 +134,7 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 
                 <!-- Reservation Management -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
@@ -146,26 +144,17 @@
                     <div class="space-y-3">
                         <h4 class="font-medium">Create Reservation</h4>
                         <form onsubmit="submitProtectedForm(event, 'POST', '/api/reservations')" class="space-y-2">
-                            <input type="number" name="accommodation_id" placeholder="Accommodation ID" class="w-full p-2 border border-gray-300 rounded" required>
-                            <input type="date" name="check_in_date" class="w-full p-2 border border-gray-300 rounded" required>
-                            <input type="date" name="check_out_date" class="w-full p-2 border border-gray-300 rounded" required>
+                            <input type="string" name="accommodation_id" placeholder="Accommodation ID" class="w-full p-2 border border-gray-300 rounded" required>
+                            <input type="string" name="deck_id" placeholder="deck ID" class="w-full p-2 border border-gray-300 rounded" required>
+                            <input type="date" name="start_date" class="w-full p-2 border border-gray-300 rounded" required>
+                            <input type="date" name="end_date" class="w-full p-2 border border-gray-300 rounded" required>
                             <input type="number" name="number_of_guests" placeholder="Number of Guests" class="w-full p-2 border border-gray-300 rounded" required>
                             <button type="submit" class="w-full py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
                                 Create Reservation
                             </button>
                         </form>
                         
-                        <div class="flex gap-2 mt-4">
-                            <input type="number" id="reservationId" placeholder="Reservation ID" class="flex-1 p-2 border border-gray-300 rounded">
-                            <button onclick="fetchProtected('GET', '/api/reservations/' + document.getElementById('reservationId').value)" 
-                                    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                Get Details
-                            </button>
-                            <button onclick="fetchProtected('PUT', '/api/reservations/' + document.getElementById('reservationId').value + '/cancel')" 
-                                    class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                                Cancel
-                            </button>
-                        </div>
+                        
                     </div>
                 </div>
                 
@@ -217,6 +206,8 @@
                         </button>
                     </div>
                 </div>
+            <button onclick="logout()" class="w-full py-2 bg-red-500 text-white rounded hover:bg-red-600">Logout</button>
+
             </div>
         </div>
         
@@ -426,6 +417,22 @@
             console.log('Register with:', sampleData.register);
             console.log('Login with:', sampleData.login);
         });
+
+        function logout() {
+    fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/login-page'; 
+        }
+    });
+}
     </script>
 </body>
 </html>

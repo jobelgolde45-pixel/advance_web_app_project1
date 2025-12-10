@@ -40,8 +40,8 @@ class ReservationController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'accommodation_id' => 'required|exists:accomodations,accomodation_id',
-            'start_date' => 'required|date|after_or_equal:today',
-            'end_date' => 'required|date|after:start_date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
             'bed_desk' => 'nullable|string',
             'layer' => 'nullable|string',
             'deck_id' => 'required|exists:deck_images,deck_id',
