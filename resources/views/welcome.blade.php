@@ -32,33 +32,10 @@
             <div class="space-y-8">
                 <!-- Authentication Section -->
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 text-blue-600">
-                        <i class="fas fa-user-circle mr-2"></i>Authentication
-                    </h2>
+                  
                     
                     
-                    <!-- Password Reset -->
-                    <div>
-                        <h3 class="font-medium mb-2 text-gray-700">3. Password Reset</h3>
-                        <div class="space-y-3">
-                            <form onsubmit="submitForm(event, 'forgotPassword')" class="space-y-3">
-                                <input type="email" name="email" placeholder="Email for password reset" 
-                                       class="w-full p-2 border border-gray-300 rounded" required>
-                                <button type="submit" class="w-full py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-                                    <i class="fas fa-key mr-2"></i>Send Reset Link
-                                </button>
-                            </form>
-                            <form onsubmit="submitForm(event, 'resetPassword')" class="space-y-3">
-                                <input type="email" name="email" placeholder="Email" class="w-full p-2 border border-gray-300 rounded" required>
-                                <input type="password" name="password" placeholder="New Password" class="w-full p-2 border border-gray-300 rounded" required>
-                                <input type="password" name="password_confirmation" placeholder="Confirm Password" class="w-full p-2 border border-gray-300 rounded" required>
-                                <input type="text" name="token" placeholder="Reset Token" class="w-full p-2 border border-gray-300 rounded" required>
-                                <button type="submit" class="w-full py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
-                                    <i class="fas fa-sync-alt mr-2"></i>Reset Password
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                  
                 </div>
                 
                 <!-- Public Accommodation Routes -->
@@ -262,7 +239,7 @@
         // Load token from localStorage
         let authToken = localStorage.getItem('authToken') || '';
         document.getElementById('authToken').value = authToken;
-        
+        console.log("Token: ", authToken || 'no token')
         // Common headers
         const headers = {
             'Accept': 'application/json',

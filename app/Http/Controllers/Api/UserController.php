@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -49,95 +51,177 @@ class UserController extends Controller
     /**
      * Update user profile
      */
-    public function updateProfile(Request $request)
-    {
-        $user = auth()->user();
-        
-        $validator = Validator::make($request->all(), [
-            'firstname' => 'sometimes|string|max:100',
-            'middlename' => 'nullable|string|max:100',
-            'lastname' => 'sometimes|string|max:100',
-            'extension_name' => 'nullable|string|max:50',
-            'province' => 'nullable|string|max:100',
-            'municipality' => 'nullable|string|max:100',
-            'barangay' => 'nullable|string|max:100',
-            'zipcode' => 'nullable|string|max:10',
-            'email' => 'sometimes|email|unique:accounts,email,' . $user->user_id . ',user_id',
-            'mobile_number' => 'sometimes|string|max:20',
-            'location' => 'nullable|string|max:255',
-            'house_name' => 'nullable|string|max:255',
-            'bio' => 'nullable|string|max:500',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
-        DB::beginTransaction();
-        try {
-            // Update basic account info
-            $user->update($request->only([
-                'firstname', 'middlename', 'lastname', 'extension_name',
-                'province', 'municipality', 'barangay', 'zipcode',
-                'email', 'mobile_number', 'location', 'house_name'
-            ]));
+public function updateProfile(Request $request)
+{
+    $user = auth()->user();
+    $user = Account::find($user->id); 
+    
+    // Log request data safely (without circular references)
+    Log::info('Update profile request received:', [
+        'user_id' => $user->user_id,
+        'request_data' => $request->all()
+    ]);
+    
+    $validator = Validator::make($request->all(), [
+        'firstname' => 'sometimes|string|max:100',
+        'first_name' => 'sometimes|string|max:100',
+        'middlename' => 'nullable|string|max:100',
+        'lastname' => 'sometimes|string|max:100',
+        'last_name' => 'sometimes|string|max:100',
+        'extension_name' => 'nullable|string|max:50',
+        'province' => 'nullable|string|max:100',
+        'municipality' => 'nullable|string|max:100',
+        'barangay' => 'nullable|string|max:100',
+        'zipcode' => 'nullable|string|max:10',
+        'email' => 'sometimes|email|unique:accounts,email,' . $user->user_id . ',user_id',
+        'mobile_number' => 'sometimes|string|max:20',
+        'phone_number' => 'sometimes|string|max:20',
+        'location' => 'nullable|string|max:255',
+        'house_name' => 'nullable|string|max:255',
+        'bio' => 'nullable|string|max:500',
+    ]);
 
-            // Update or create profile info
-            if ($request->has('bio')) {
-                $profileInfo = ProfileInfo::updateOrCreate(
-                    ['user_id' => $user->user_id],
-                    ['bio' => $request->bio]
-                );
-            }
-
-            // If owner, update DTI permit if provided
-            if ($user->isOwner() && $request->hasFile('dti_permit')) {
-                $validator = Validator::make($request->all(), [
-                    'dti_permit' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
-                ]);
-
-                if ($validator->fails()) {
-                    return response()->json([
-                        'success' => false,
-                        'errors' => $validator->errors()
-                    ], 422);
-                }
-
-                // Delete old DTI permit if exists
-                if ($user->dti_permit && Storage::exists('public/dti-permits/' . $user->dti_permit)) {
-                    Storage::delete('public/dti-permits/' . $user->dti_permit);
-                }
-
-                // Upload new DTI permit
-                $file = $request->file('dti_permit');
-                $fileName = 'dti_' . $user->user_id . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs('dti-permits', $fileName, 'public');
-                
-                $user->dti_permit = $fileName;
-                $user->save();
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Profile updated successfully',
-                'data' => $user->fresh(['profileInfo'])
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update profile',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors' => $validator->errors()
+        ], 422);
     }
 
+    DB::beginTransaction();
+    try {
+        // Map request field names to database field names
+        $fieldMapping = [
+            'first_name' => 'firstname',    // Map first_name to firstname
+            'last_name' => 'lastname',      // Map last_name to lastname
+            'phone_number' => 'mobile_number', // Map phone_number to mobile_number
+        ];
+        
+        // Start with direct fields that don't need mapping
+        $updateData = [];
+        
+        // First, handle fields that need mapping
+        foreach ($fieldMapping as $requestField => $dbField) {
+            if ($request->has($requestField) && $request->input($requestField) !== null) {
+                $updateData[$dbField] = $request->input($requestField);
+            }
+        }
+        
+        // Then add direct fields (with original names)
+        $directFields = [
+            'firstname', 'middlename', 'lastname', 'extension_name',
+            'province', 'municipality', 'barangay', 'zipcode',
+            'email', 'mobile_number', 'location', 'house_name'
+        ];
+        
+        foreach ($directFields as $field) {
+            if ($request->has($field) && $request->input($field) !== null) {
+                $updateData[$field] = $request->input($field);
+            }
+        }
+        
+        // Debug: Check what we're updating
+        Log::info('Updating user data:', [
+            'user_id' => $user->user_id,
+            'update_data' => $updateData,
+            'current_firstname' => $user->firstname,
+            'current_lastname' => $user->lastname,
+            'current_mobile_number' => $user->mobile_number
+        ]);
+        
+        // Check if updateData is empty
+        if (empty($updateData)) {
+            Log::info('No valid data to update. Request fields were:', array_keys($request->all()));
+        }
+        
+        // Update the user
+        $user->fill($updateData);
+        
+        // Check if anything actually changed
+        if ($user->isDirty()) {
+            $user->save();
+            Log::info('User updated. Changed fields:', $user->getDirty());
+        } else {
+            Log::info('No changes detected for user. Update data was:', $updateData);
+        }
+        
+        // Update or create profile info
+        if ($request->has('bio') && $request->bio !== null) {
+            $profileInfo = ProfileInfo::updateOrCreate(
+                ['user_id' => $user->user_id],
+                ['bio' => $request->bio]
+            );
+            Log::info('Profile info updated:', [
+                'user_id' => $user->user_id,
+                'bio_updated' => $request->bio !== null
+            ]);
+        }
+        
+        // If owner, update DTI permit if provided
+        if ($user->isOwner() && $request->hasFile('dti_permit')) {
+            $validator = Validator::make($request->all(), [
+                'dti_permit' => 'required|file|mimes:jpeg,png,jpg,pdf|max:5120',
+            ]);
+
+            if ($validator->fails()) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Delete old DTI permit if exists
+            if ($user->dti_permit && Storage::exists('public/dti-permits/' . $user->dti_permit)) {
+                Storage::delete('public/dti-permits/' . $user->dti_permit);
+            }
+
+            // Upload new DTI permit
+            $file = $request->file('dti_permit');
+            $fileName = 'dti_' . $user->user_id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('dti-permits', $fileName, 'public');
+            
+            $user->dti_permit = $fileName;
+            $user->save();
+            
+            Log::info('DTI permit updated:', ['file_name' => $fileName]);
+        }
+        
+        DB::commit();
+        
+        // Load fresh data
+        $user->refresh();
+        $userData = $user->toArray();
+        
+        // Manually add profile info to avoid circular references
+        $profileInfo = ProfileInfo::where('user_id', $user->user_id)->first();
+        if ($profileInfo) {
+            $userData['profile_info'] = $profileInfo->only(['id', 'user_id', 'bio', 'created_at', 'updated_at']);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully',
+            'data' => $userData,
+            'updated_fields' => !empty($updateData) ? array_keys($updateData) : []
+        ]);
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Profile update failed:', [
+            'user_id' => $user->user_id ?? 'unknown',
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to update profile',
+            'error' => config('app.debug') ? $e->getMessage() : 'An error occurred'
+        ], 500);
+    }
+}
     /**
      * Update profile photo
      */

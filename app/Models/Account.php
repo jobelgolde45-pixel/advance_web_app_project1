@@ -324,45 +324,64 @@ class Account extends Authenticatable
     /**
      * Get statistics for dashboard (for owners)
      */
-    public function getOwnerStatisticsAttribute(): array
-    {
-        if (!$this->isOwner()) {
-            return [];
-        }
-        
-        $accommodationsCount = $this->accommodations()->count();
-        $activeReservations = $this->ownerReservations()
-            ->where('reservation_status', 'Approved')
-            ->whereDate('end_date', '>=', now())
-            ->count();
-        
-        $totalRevenue = $this->ownerReservations()
-            ->where('reservation_status', 'Approved')
-            ->whereYear('date_application', now()->year)
-            ->get()
-            ->sum(function($reservation) {
-                $accommodation = $reservation->accommodation;
-                if ($accommodation) {
-                    $days = $reservation->calculateTotalDays();
-                    return $days * ($accommodation->monthly_rate / 30);
-                }
-                return 0;
-            });
-        
-        $occupancyRate = $accommodationsCount > 0 
-            ? ($this->accommodations()->sum('total_beds') - $this->accommodations()->sum('available_beds')) / $this->accommodations()->sum('total_beds') * 100
-            : 0;
-        
-        return [
-            'accommodations_count' => $accommodationsCount,
-            'active_reservations' => $activeReservations,
-            'total_revenue' => $totalRevenue,
-            'occupancy_rate' => round($occupancyRate, 2),
-            'pending_reservations' => $this->ownerReservations()
-                ->where('reservation_status', 'Pending')
-                ->count(),
-        ];
+   public function getOwnerStatisticsAttribute(): array
+{
+    if (!$this->isOwner()) {
+        return [];
     }
+    
+    $accommodationsCount = $this->accommodations()->count();
+    $activeReservations = $this->ownerReservations()
+        ->where('reservation_status', 'Approved')
+        ->whereDate('end_date', '>=', now())
+        ->count();
+    
+    $totalRevenue = $this->ownerReservations()
+        ->where('reservation_status', 'Approved')
+        ->whereYear('date_application', now()->year)
+        ->get()
+        ->sum(function($reservation) {
+            $accommodation = $reservation->accommodation;
+            if ($accommodation) {
+                $days = $reservation->calculateTotalDays();
+                return $days * ($accommodation->monthly_rate / 30);
+            }
+            return 0;
+        });
+    
+    // FIXED OCCUPANCY RATE CALCULATION
+    $totalBeds = $this->accommodations()->sum('total_beds');
+    
+    // Option 1: If you track occupancy by reservation count
+    $occupiedBeds = $this->ownerReservations()
+        ->where('reservation_status', 'Approved')
+        ->whereDate('end_date', '>=', now())
+        ->count();
+    
+    // Option 2: If you track occupancy by accommodation status
+    $occupiedBeds = $this->accommodations()
+        ->where('status', 'Occupied')
+        ->sum('total_beds');
+    
+    // Calculate occupancy rate
+    $occupancyRate = $totalBeds > 0 
+        ? ($occupiedBeds / $totalBeds) * 100
+        : 0;
+    
+    return [
+        'accommodations_count' => $accommodationsCount,
+        'active_reservations' => $activeReservations,
+        'total_revenue' => $totalRevenue,
+        'occupancy_rate' => round($occupancyRate, 2),
+        'pending_reservations' => $this->ownerReservations()
+            ->where('reservation_status', 'Pending')
+            ->count(),
+        // Add these for debugging/info
+        'total_beds' => $totalBeds,
+        'occupied_beds' => $occupiedBeds,
+        'available_beds' => $totalBeds - $occupiedBeds,
+    ];
+}
 
     /**
      * Get statistics for dashboard (for tenants)

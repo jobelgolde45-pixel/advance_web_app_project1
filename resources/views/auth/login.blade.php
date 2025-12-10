@@ -359,16 +359,18 @@
             
             // Parse response
             const result = await response.json();
-            
+             
             if (response.ok) {
                 showNotification('Login successful! Redirecting...', 'success');
                 
                 // Save token if present
-                if (result.token || result.access_token) {
-                    const token = result.token || result.access_token;
+                if (result.token || result.access_token || result.data.access_token) {
+                    const token = result.token || result.access_token || result.data.access_token;
                     localStorage.setItem('authToken', token.startsWith('Bearer ') ? token : `Bearer ${token}`);
                     localStorage.setItem('userData', JSON.stringify(result.user || {}));
                     
+                    const getToken = localStorage.getItem('authToken');
+                    console.log("token from login: ", getToken)
                     // Remember me
                     if (remember) {
                         localStorage.setItem('rememberedUser', identifier);
