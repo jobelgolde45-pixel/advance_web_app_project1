@@ -165,30 +165,32 @@ public function register(Request $request)
         ], 422);
     }
 
-    // Determine the login value and field
+    // Determine login field/value
     $loginValue = $request->login ?? $request->identifier ?? $request->email ?? $request->username;
     $loginField = $this->getLoginField($loginValue);
 
-    // Correct credentials
-    $credentials = [
-        $loginField => $loginValue,
-        'password' => $request->password,
-    ];
+    // Fetch user manually
+    $user = Account::where($loginField, $loginValue)->first();
+    Log::info('User Found: ', $user->toArray());
+Log::info('Password check: ' . (Hash::check('password123', $user->password) ? 'match' : 'no match'));
 
-    // Attempt login
-    if (!auth()->attempt($credentials)) {
+    if (!$user) {
         return response()->json([
             'success' => false,
-            'message' => 'Invalid credentials'
+            'message' => 'Invalid credentials (user not found)'
         ], 401);
     }
 
-    // Fetch the authenticated user
-    $user = Account::where($loginField, $loginValue)->first();
+    // Manually verify password
+    if (!Hash::check($request->password, $user->password)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid credentials (wrong password)'
+        ], 401);
+    }
 
     // Check approval status
     if ($user->status !== 'Approved') {
-        auth()->logout();
 
         $statusMessage = $user->status === 'Pending'
             ? 'Your account is pending admin approval.'
@@ -203,10 +205,10 @@ public function register(Request $request)
         ], 403);
     }
 
-    // Update last seen timestamp
+    // Update last seen
     $user->updateLastSeen();
 
-    // Generate token
+    // Create token manually (Sanctum)
     $token = $user->createToken('auth_token')->plainTextToken;
 
     return response()->json([
@@ -537,7 +539,7 @@ public function register(Request $request)
      */
     private function getLoginField($login)
     {
-        if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($login, FILTER_VALIDATE_EMAIL) && preg_match('/.+\..+$/', $login)) {
             return 'email';
         }
         

@@ -170,7 +170,7 @@
             </div>
         </div>
 
-        <!-- Demo Accounts Panel
+        <!-- Demo Accounts Panel -->
         <div class="mt-8 bg-white/10 backdrop-blur-sm rounded-2xl p-6 card-shadow">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-white font-bold text-lg">
@@ -183,22 +183,7 @@
             
             <div id="demoAccounts" class="hidden">
                 <div class="grid md:grid-cols-3 gap-4">
-                    <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                        <div class="flex items-center mb-3">
-                            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                                <i class="fas fa-user text-white text-sm"></i>
-                            </div>
-                            <h4 class="font-semibold text-white">Tenant Account</h4>
-                        </div>
-                        <div class="space-y-2">
-                            <p class="text-indigo-200 text-sm">Username: <span class="text-white font-mono">juan.tenant</span></p>
-                            <p class="text-indigo-200 text-sm">Password: <span class="text-white font-mono">Password123</span></p>
-                            <button onclick="fillDemoCredentials('tenant')" 
-                                    class="w-full mt-2 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors">
-                                Use This Account
-                            </button>
-                        </div>
-                    </div>
+                    
 
                     <div class="bg-white/5 rounded-xl p-4 border border-white/10">
                         <div class="flex items-center mb-3">
@@ -236,7 +221,7 @@
                 </div>
             </div>
         </div>
-    </div>  -->
+    </div>  
 
     <!-- Forgot Password Modal -->
     <div id="forgotPasswordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden z-50">
@@ -306,12 +291,12 @@
             password: 'Password123'
         },
         owner: {
-            identifier: 'maria.owner',
-            password: 'Password123'
+            identifier: 'helengelilio14@gmail.com',
+            password: 'password123'
         },
         admin: {
-            identifier: 'admin',
-            password: 'Admin123'
+            identifier: 'Admin@gmail.com',
+            password: 'password123'
         }
     };
 
@@ -396,9 +381,9 @@
                 setTimeout(() => {
                     const userType = result.user?.user_type || result.user?.role || 'tenant';
                     const redirects = {
-                        'admin': '/admin/dashboard',
-                        'owner': '/owner/dashboard',
-                        'tenant': '/tenant/dashboard'
+                        'admin': '/welcome',
+                        'owner': '/welcome',
+                        'tenant': '/welcome'
                     };
                     
                     window.location.href = redirects[userType.toLowerCase()] || '/dashboard';

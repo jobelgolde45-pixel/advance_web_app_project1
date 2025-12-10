@@ -461,6 +461,7 @@
     <input type="hidden" id="user_type" value="">
 
     <script>
+        alert("We provide a predefined login credentials for quick testing. visit login page")
         // Registration Data Object
         let registrationData = {
             user_type: '',
