@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AccommodationController extends Controller
 {
@@ -550,17 +551,25 @@ class AccommodationController extends Controller
     /**
      * Get all accommodations (admin only).
      */
-    public function getAllAccommodations(Request $request)
-    {
-        $user = Auth::user();
-        
-        if ($user->user_type !== 'Admin') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Admin access required'
-            ], 403);
-        }
+   public function getAllAccommodations(Request $request)
+{
+    // Add JSON response headers early
+    header('Content-Type: application/json; charset=utf-8');
+    
+    // Temporarily disable error output to prevent corrupting JSON
+    ini_set('display_errors', 0);
+    
+    $user = Auth::user();
+    /**
+     * if ($user->user_type !== 'Admin') {
+     *     return response()->json([
+     *         'success' => false,
+     *         'message' => 'Admin access required'
+     *     ], 403);
+     * }
+     */
 
+    try {
         $perPage = $request->query('per_page', 20);
         $status = $request->query('status');
         $type = $request->query('type');
@@ -577,10 +586,44 @@ class AccommodationController extends Controller
         }
 
         $accommodations = $query->paginate($perPage);
-
+        
+        // Convert to array first to check for issues
+        $data = $accommodations->toArray();
+        
+        // Check for circular references or invalid UTF-8
+        $jsonCheck = json_encode($data);
+        
+        if ($jsonCheck === false) {
+            // Log the JSON error
+            Log::error('JSON encoding failed:', [
+                'json_error' => json_last_error_msg(),
+                'data_sample' => mb_substr(print_r($data, true), 0, 500)
+            ]);
+            
+            // Return a clean error response
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to encode data to JSON',
+                'error' => json_last_error_msg()
+            ], 500);
+        }
+        
         return response()->json([
             'success' => true,
-            'data' => $accommodations
+            'data' => $data
+        ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    } catch (\Exception $e) {
+        Log::error('Error in getAllAccommodations:', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
         ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while fetching accommodations',
+            'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+        ], 500);
     }
+}
 }

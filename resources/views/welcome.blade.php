@@ -96,13 +96,7 @@
                             </button>
                         </form>
                         
-                        <h4 class="font-medium mt-4">Update Profile Photo</h4>
-                        <form onsubmit="submitProtectedForm(event, 'POST', '/api/user/profile/photo')" class="space-y-3">
-                            <input type="file" name="photo" class="w-full p-2 border border-gray-300 rounded" required>
-                            <button type="submit" class="w-full py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                                Upload Photo
-                            </button>
-                        </form>
+                        
                     </div>
                 </div>
                 
